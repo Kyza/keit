@@ -1,0 +1,12 @@
+{
+	"name": "keit",
+	"version": "1.0.0",
+	"description": "Accurately and easily benchmark the speediness your synchronous functions.",
+	"main": "index.js",
+	"type": "module",
+	"scripts": {
+		"test": "node ./test.js"
+	},
+	"author": "Kyza",
+	"license": "MIT"
+}
