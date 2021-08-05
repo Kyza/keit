@@ -1,8 +1,10 @@
 export class Block {
-	constructor({ pre, code, post } = {}) {
+	constructor({ first, pre, code, post, last } = {}) {
+		this.first = first ?? (() => {});
 		this.pre = pre ?? (() => {});
 		this.code = code ?? ((start, end) => (start(), end(), void 0));
 		this.post = post ?? (() => {});
+		this.last = last ?? (() => {});
 	}
 }
 
@@ -69,6 +71,7 @@ export default async function keit({
 		// This is the first time the code is run.
 		// It should be unoptimized for repeated runs.
 		// This is what you want to look at when the code will be run once.
+		block.first();
 		const { time, result } = benchmark(block);
 		results[name] = { cold: { time, result }, hot: [] };
 		emitter && emitter.emit("COLD", { name, time, result });
@@ -82,6 +85,7 @@ export default async function keit({
 			results[name].hot.push({ time, result });
 			emitter && emitter.emit("HOT", { name, time, result });
 		}
+		block.last();
 
 		const hotTimes = results[name].hot.map((h) => h.time);
 		const hotSum = hotTimes.reduce((acc, val) => acc + val, 0);
