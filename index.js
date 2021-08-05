@@ -28,9 +28,13 @@ export function benchmark(block = new Block()) {
 
 export async function simple(funcs = [], iterations = 1e3) {
 	const blocks = funcs.reduce((acc, func) => {
-		acc[func.toString()] = new Block({
-			code: func,
-		});
+		if (typeof func === "function") {
+			acc[func.toString()] = new Block({
+				code: func,
+			});
+		} else {
+			acc[func.code.toString()] = new Block(func);
+		}
 		return acc;
 	}, {});
 	const { results } = await keit({
@@ -111,8 +115,11 @@ export default async function keit({
 
 	// Once they're all finished they can be scored.
 	for (const [name, result] of Object.entries(results)) {
-		result.score = (result.average + result.slowest - result.fastest) * weight;
-		result.score += result.averageHot + result.slowestHot - result.fastestHot;
+		result.score =
+			result.average +
+			result.averageHot +
+			result.slowestHot -
+			result.fastestHot;
 		emitter && emitter.emit("SCORE", { name, score: results.score });
 	}
 
